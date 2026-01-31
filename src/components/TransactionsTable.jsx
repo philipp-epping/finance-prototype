@@ -6,6 +6,7 @@ import MonthPicker from './MonthPicker'
 import DateRangePicker from './DateRangePicker'
 import UploadDocumentsModal from './UploadDocumentsModal'
 import AdvancedFilterPanel from './AdvancedFilterPanel'
+import TransactionDetailDrawer from './TransactionDetailDrawer'
 
 const TransactionsTable = ({ account, transactions, onBack, bankAccounts = [] }) => {
   // Filter state
@@ -225,6 +226,31 @@ const TransactionsTable = ({ account, transactions, onBack, bankAccounts = [] })
   
   // State for filter panel
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+  
+  // State for transaction detail drawer
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
+  
+  // Handle row click to open drawer
+  const handleRowClick = (transaction) => {
+    setSelectedTransaction(transaction)
+  }
+  
+  // Handle closing the drawer
+  const handleCloseDrawer = () => {
+    setSelectedTransaction(null)
+  }
+  
+  // Handle category selection from drawer
+  const handleCategorySelect = (transactionId, category) => {
+    console.log('Category selected for', transactionId, category)
+    // TODO: Update transaction category in state/backend
+  }
+  
+  // Handle private toggle from drawer
+  const handlePrivateToggle = (transactionId, isPrivate) => {
+    console.log('Toggle private for', transactionId, isPrivate)
+    // TODO: Update transaction in state/backend
+  }
 
   // Table columns configuration
   const columns = [
@@ -475,6 +501,8 @@ const TransactionsTable = ({ account, transactions, onBack, bankAccounts = [] })
           selectedIds={selectedIds}
           onSelectionChange={setSelectedIds}
           rowIdAccessor={(row) => row.id}
+          onRowClick={handleRowClick}
+          activeRowId={selectedTransaction?.id}
         />
       </div>
       
@@ -535,6 +563,15 @@ const TransactionsTable = ({ account, transactions, onBack, bankAccounts = [] })
       <UploadDocumentsModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+      />
+
+      {/* Transaction Detail Drawer */}
+      <TransactionDetailDrawer
+        transaction={selectedTransaction}
+        isOpen={!!selectedTransaction}
+        onClose={handleCloseDrawer}
+        onCategorySelect={handleCategorySelect}
+        onPrivateToggle={handlePrivateToggle}
       />
     </div>
   )
