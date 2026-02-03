@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ClientPortalSidebar from '../components/ClientPortalSidebar'
+import ClientDashboard from '../components/ClientDashboard'
 
 function ClientPortal() {
   const [selectedView, setSelectedView] = useState('client')
@@ -19,14 +20,7 @@ function ClientPortal() {
   const renderContent = () => {
     switch (selectedView) {
       case 'client':
-        return (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-xl font-semibold text-[#18181A] mb-2">Client View</h1>
-              <p className="text-[#8D8D8D]">This view is ready for development.</p>
-            </div>
-          </div>
-        )
+        return <ClientDashboard />
       case 'agency':
         return (
           <div className="flex-1 flex items-center justify-center">

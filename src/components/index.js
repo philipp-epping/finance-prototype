@@ -14,3 +14,11 @@ export { default as ManualEntryForm } from './ManualEntryForm'
 export { default as CashFlowChart } from './CashFlowChart'
 export { default as DateRangePicker } from './DateRangePicker'
 export { default as MonthPicker } from './MonthPicker'
+
+// Client Portal components
+export { default as ClientDashboard } from './ClientDashboard'
+export { default as ClientTasksSection } from './ClientTasksSection'
+export { default as ClientRoadmap } from './ClientRoadmap'
+export { default as ClientMilestone } from './ClientMilestone'
+export { default as ClientMeetings } from './ClientMeetings'
+export { default as ClientPortalSidebar } from './ClientPortalSidebar'
