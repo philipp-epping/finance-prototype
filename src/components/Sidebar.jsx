@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { 
   LayoutDashboard, 
   CreditCard, 
@@ -11,7 +12,8 @@ import {
   Search,
   FileText,
   HelpCircle,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react'
 import Tooltip from './ui/Tooltip'
 
@@ -23,7 +25,8 @@ const Sidebar = ({
   onToggleNav,
   uncategorizedCount = 0,
   unmatchedReceiptsCount = 0,
-  unmatchedDocumentsCount = 0
+  unmatchedDocumentsCount = 0,
+  backLink = null
 }) => {
   const [financesExpanded, setFinancesExpanded] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(true)
@@ -36,6 +39,16 @@ const Sidebar = ({
       <aside className="w-14 bg-[#FAFAFA] border-r border-[#E8E8E8] flex flex-col flex-shrink-0 transition-all duration-200">
         {/* Header with Company Icon and Toggle */}
         <div className="p-2 flex flex-col items-center gap-2">
+          {backLink && (
+            <Tooltip content="Back to Explorations" position="right">
+              <Link
+                to={backLink}
+                className="w-8 h-8 flex items-center justify-center rounded-sm text-[#8D8D8D] hover:bg-[#F0F0F0] hover:text-[#656565] transition-colors duration-[120ms]"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </Tooltip>
+          )}
           <div className="w-8 h-8 bg-[#4D5FFF] rounded-sm flex items-center justify-center">
             <span className="text-12 font-semibold text-white">L</span>
           </div>
@@ -134,6 +147,19 @@ const Sidebar = ({
   // Expanded sidebar view - 272px from Figma
   return (
     <aside className="w-[272px] bg-[#FAFAFA] border-r border-[#E8E8E8] flex flex-col flex-shrink-0 transition-all duration-200">
+      {/* Back Link */}
+      {backLink && (
+        <div className="px-4 pt-3">
+          <Link
+            to={backLink}
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#656565] hover:text-[#18181A] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Explorations
+          </Link>
+        </div>
+      )}
+      
       {/* Company Header / Org Switch */}
       <div className="px-4 py-2">
         <div className="flex items-center justify-between py-2">
