@@ -165,6 +165,7 @@ const ClientMilestone = ({ milestone, onTaskToggle, defaultExpanded = false }) =
                     checked={task.status === 'completed'}
                     onChange={() => handleTaskToggle(task)}
                     disabled={task.assignee === 'agency'}
+                    completedVariant={task.assignee === 'client' ? 'grey' : undefined}
                   />
                   <span
                     className={`text-13 ${
@@ -177,7 +178,7 @@ const ClientMilestone = ({ milestone, onTaskToggle, defaultExpanded = false }) =
                   </span>
                 </div>
                 <Badge
-                  variant={task.assignee === 'client' ? 'primary' : 'neutral'}
+                  variant={task.assignee === 'client' && task.status !== 'completed' ? 'primary' : 'neutral'}
                 >
                   {task.assignee === 'client' ? 'You' : 'Agency'}
                 </Badge>

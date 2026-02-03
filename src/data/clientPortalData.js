@@ -3,6 +3,178 @@
 
 // Task status values: 'active', 'completed', 'backlog', 'cancelled'
 
+// Meetings data for the client portal
+export const clientMeetings = {
+  // Next upcoming meeting
+  upcoming: {
+    id: 'mtg-upcoming',
+    title: "Robert: [DXR] Clemens und Robert",
+    date: "2026-02-04T14:00:00",
+    participants: [
+      { id: 'p-1', name: 'Clemens', avatar: null },
+      { id: 'p-2', name: 'Robert', avatar: null }
+    ],
+    meetingLink: 'https://meet.google.com/abc-defg-hij',
+    hasRecording: false
+  },
+  // Past meetings list
+  past: [
+    {
+      id: 'mtg-1',
+      title: "David Bock x Denis",
+      date: "2026-06-25T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: true,
+      recordingUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      recordingThumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=450&fit=crop',
+      notes: {
+        content: '',
+        quickActions: [
+          { id: 'qa-1', label: 'Meeting Agenda', icon: 'file-text' },
+          { id: 'qa-2', label: 'OB Call', icon: 'phone' }
+        ],
+        connected: true
+      },
+      summary: null,
+      transcript: [
+        { id: 'tr-1', speaker: 'Louie', timestamp: '0:04', seconds: 4, text: "Hi Tim, I really appreciate you making time for today's call. Before we get into details, how have things been progressing on your side since our last check-in?" },
+        { id: 'tr-2', speaker: 'Tim', timestamp: '0:07', seconds: 7, text: "Hi! Thanks for asking. Overall things have been running smoothly, and our team has already started testing the new dashboard internally to see how it fits into our daily workflow." },
+        { id: 'tr-3', speaker: 'Louie', timestamp: '0:10', seconds: 10, text: "That's great to hear. I'm curious — have you or your team noticed any challenges or potential blockers during this initial testing phase?" },
+        { id: 'tr-4', speaker: 'Tim', timestamp: '0:14', seconds: 14, text: "A couple of our colleagues mentioned that the loading time feels a bit slow whenever they try to pull larger reports, especially those with several months of data." },
+        { id: 'tr-5', speaker: 'Louie', timestamp: '0:21', seconds: 21, text: "Understood, thanks for pointing that out. I'll raise this with our developers and make sure performance improvements are prioritized in the next sprint. Aside from speed, is there anything else you'd like us to focus on?" },
+        { id: 'tr-6', speaker: 'Tim', timestamp: '13:33', seconds: 813, text: "Sounds perfect, thank you. That will help us keep everyone on the same page." }
+      ]
+    },
+    {
+      id: 'mtg-2',
+      title: "David Bock x Denis",
+      date: "2026-06-18T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: true,
+      recordingUrl: null,
+      notes: {
+        content: 'Discussed quarterly goals and upcoming milestones.',
+        quickActions: [],
+        connected: false
+      },
+      summary: 'Reviewed Q2 progress. Client satisfied with current trajectory. Next steps: finalize design mockups by end of month.',
+      transcript: []
+    },
+    {
+      id: 'mtg-3',
+      title: "David Bock x Denis",
+      date: "2026-06-11T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-4',
+      title: "David Bock x Denis",
+      date: "2026-06-04T14:30:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: true,
+      recordingUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      notes: { content: '', quickActions: [], connected: false },
+      summary: 'Kickoff meeting for the website redesign project. Established timeline and key deliverables.',
+      transcript: []
+    },
+    {
+      id: 'mtg-5',
+      title: "David Bock x Denis",
+      date: "2026-05-28T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-6',
+      title: "David Bock x Denis",
+      date: "2026-05-21T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-7',
+      title: "David Bock x Denis",
+      date: "2026-05-14T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-8',
+      title: "David Bock x Denis",
+      date: "2026-05-07T14:30:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-9',
+      title: "David Bock x Denis",
+      date: "2026-04-30T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    },
+    {
+      id: 'mtg-10',
+      title: "David Bock x Denis",
+      date: "2026-04-23T12:00:00",
+      participants: [{ id: 'p-3', name: 'Denis', avatar: null }],
+      hasRecording: false,
+      notes: { content: '', quickActions: [], connected: false },
+      summary: null,
+      transcript: []
+    }
+  ]
+}
+
+// Helper function to format meeting time relative to now
+export const formatMeetingTime = (dateString) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = date - now
+  const diffHours = Math.round(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24))
+  const diffWeeks = Math.round(diffDays / 7)
+  
+  if (diffMs < 0) {
+    // Past meeting
+    return null
+  } else if (diffHours < 24) {
+    return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`
+  } else if (diffDays <= 10) {
+    return `in ${diffDays} day${diffDays !== 1 ? 's' : ''}`
+  } else {
+    return `in ${diffWeeks} week${diffWeeks !== 1 ? 's' : ''}`
+  }
+}
+
+// Helper function to format meeting date for display
+export const formatMeetingDate = (dateString) => {
+  const date = new Date(dateString)
+  return {
+    month: date.toLocaleDateString('en-US', { month: 'short' }),
+    day: date.getDate().toString().padStart(2, '0'),
+    time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  }
+}
+
 export const clientProject = {
   id: 'proj-1',
   name: 'Website Redesign',

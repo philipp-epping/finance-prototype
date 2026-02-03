@@ -7,9 +7,11 @@ const Checkbox = ({
   indeterminate = false,
   onChange, 
   disabled = false, 
+  completedVariant,
   className = '' 
 }) => {
   const isActive = checked || indeterminate
+  const useGreyStyle = completedVariant === 'grey' && checked
 
   return (
     <label className={`inline-flex items-center gap-2 cursor-pointer ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${className}`}>
@@ -24,7 +26,9 @@ const Checkbox = ({
         {/* Checkbox: 16x16px, 4px border radius - larger squared style */}
         <div className={`w-4 h-4 rounded-[4px] border transition-all duration-[120ms] flex items-center justify-center ${
           isActive 
-            ? 'bg-[#4D5FFF] border-[#4D5FFF]' 
+            ? useGreyStyle
+              ? 'bg-[#8D8D8D] border-[#8D8D8D]'
+              : 'bg-[#4D5FFF] border-[#4D5FFF]' 
             : 'bg-white border-[#D9D9D9] hover:bg-[#F0F0F0]'
         } ${disabled && isActive ? 'bg-[#D9D9D9] border-[#D9D9D9]' : ''}`}>
           {indeterminate && !checked && (
