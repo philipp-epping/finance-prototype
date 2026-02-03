@@ -101,7 +101,8 @@ const ClientDashboard = () => {
               status: 'active',
               dueDate: taskData.dueDate,
               blocksMilestone: false,
-              needsAttention: false
+              needsAttention: false,
+              description: taskData.description || ''
             }
           ]
         }
@@ -123,7 +124,8 @@ const ClientDashboard = () => {
               ...task,
               title: taskData.title,
               dueDate: taskData.dueDate,
-              assigneeName: taskData.assigneeName
+              assigneeName: taskData.assigneeName,
+              description: taskData.description || ''
               // Note: milestoneId changes would require moving the task between milestones
             }
           })

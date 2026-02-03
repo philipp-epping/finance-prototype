@@ -1,6 +1,112 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { CheckCircle2, ClipboardList, Check, Plus, MoreHorizontal, HelpCircle, ArrowLeft, ThumbsUp, ThumbsDown, X, User, Calendar, Pencil } from 'lucide-react'
+import { CheckCircle2, ClipboardList, Check, Plus, MoreHorizontal, HelpCircle, ArrowLeft, ThumbsUp, ThumbsDown, X, User, Calendar, Pencil, Target, FileText, ChevronDown } from 'lucide-react'
 import { getTasksForView, isTaskOverdue, formatDueDate, groupTasksByAssignee } from '../data/clientPortalData'
+
+// Searchable Select Component
+const SearchableSelect = ({ value, options, onChange, placeholder = 'Search...', displayValue }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const containerRef = useRef(null)
+  const inputRef = useRef(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false)
+        setSearchTerm('')
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Filter options based on search term
+  const filteredOptions = options.filter(option => {
+    const optionText = typeof option === 'string' ? option : option.name
+    return optionText.toLowerCase().includes(searchTerm.toLowerCase())
+  })
+
+  const handleSelect = (option) => {
+    const optionValue = typeof option === 'string' ? option : option.id
+    onChange(optionValue)
+    setIsOpen(false)
+    setSearchTerm('')
+  }
+
+  const handleInputChange = (e) => {
+    setSearchTerm(e.target.value)
+    if (!isOpen) setIsOpen(true)
+  }
+
+  const handleInputFocus = () => {
+    setIsOpen(true)
+  }
+
+  const getDisplayText = () => {
+    if (displayValue) return displayValue
+    if (!value) return ''
+    const selected = options.find(opt => 
+      typeof opt === 'string' ? opt === value : opt.id === value
+    )
+    return selected ? (typeof selected === 'string' ? selected : selected.name) : ''
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={isOpen ? searchTerm : getDisplayText()}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          placeholder={isOpen ? placeholder : (getDisplayText() || placeholder)}
+          className="w-full px-3 py-2 pr-8 text-14 text-[rgba(43,40,39,0.9)] placeholder-[#BFBCBA]
+            border border-[#E8E8E8] rounded-lg bg-white
+            focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
+            transition-colors"
+        />
+        <button
+          type="button"
+          onClick={() => { setIsOpen(!isOpen); if (!isOpen) inputRef.current?.focus(); }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#736F6D] hover:text-[#18181A]"
+        >
+          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+      
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-[#E8E8E8] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          {filteredOptions.length === 0 ? (
+            <div className="px-3 py-2 text-14 text-[#736F6D]">No results found</div>
+          ) : (
+            filteredOptions.map((option, index) => {
+              const optionValue = typeof option === 'string' ? option : option.id
+              const optionText = typeof option === 'string' ? option : option.name
+              const isSelected = optionValue === value
+              
+              return (
+                <button
+                  key={optionValue}
+                  type="button"
+                  onClick={() => handleSelect(option)}
+                  className={`w-full px-3 py-2 text-left text-14 transition-colors
+                    ${isSelected 
+                      ? 'bg-[#EEF0FF] text-[#4D5FFF]' 
+                      : 'text-[rgba(43,40,39,0.9)] hover:bg-[#F5F5F5]'
+                    }`}
+                >
+                  {optionText}
+                </button>
+              )
+            })
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const ClientTasksSection = ({ 
   project, 
@@ -29,7 +135,8 @@ const ClientTasksSection = ({
     title: '',
     dueDate: '',
     assigneeName: '',
-    milestoneId: ''
+    milestoneId: '',
+    description: ''
   })
 
   // Get all unique assignee names from project
@@ -123,7 +230,8 @@ const ClientTasksSection = ({
       title: task.title,
       dueDate: task.dueDate || '',
       assigneeName: task.assigneeName || '',
-      milestoneId: task.milestoneId || ''
+      milestoneId: task.milestoneId || '',
+      description: task.description || ''
     })
     setTaskModalMode('view')
     setTaskModalOpen(true)
@@ -135,7 +243,8 @@ const ClientTasksSection = ({
       title: '',
       dueDate: '',
       assigneeName: allAssigneeNames[0] || '',
-      milestoneId: ''
+      milestoneId: '',
+      description: ''
     })
     setTaskModalMode('add')
     setTaskModalOpen(true)
@@ -304,10 +413,13 @@ const ClientTasksSection = ({
     }
     
     return (
-      <div className="inline-flex rounded-md overflow-hidden border border-[#E8E8E8] w-[200px]">
+      <div 
+        className="inline-flex rounded-md overflow-hidden border border-[#E8E8E8] w-[200px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Approve button (thumbs up) - larger click area */}
         <button
-          onClick={() => handleApprove(task)}
+          onClick={(e) => { e.stopPropagation(); handleApprove(task); }}
           onMouseEnter={() => setHovered('approve')}
           onMouseLeave={() => setHovered(null)}
           className={`inline-flex items-center justify-center w-[35px] py-2.5 transition-colors duration-[120ms]
@@ -326,7 +438,7 @@ const ClientTasksSection = ({
         
         {/* Reject button (thumbs down) - larger click area */}
         <button
-          onClick={() => handleRequestChange(task)}
+          onClick={(e) => { e.stopPropagation(); handleRequestChange(task); }}
           onMouseEnter={() => setHovered('reject')}
           onMouseLeave={() => setHovered(null)}
           className={`inline-flex items-center justify-center w-[35px] py-2.5 transition-colors duration-[120ms]
@@ -416,7 +528,11 @@ const ClientTasksSection = ({
     </div>
   ) : null
 
+  // Check if the selected task is a review task
+  const selectedTaskIsReview = selectedTask ? isReviewTask(selectedTask) : false
+
   // Task Modal - for viewing/editing/adding tasks
+  // Show placeholder modal for review tasks, full modal for regular tasks
   const taskModal = taskModalOpen ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -425,147 +541,285 @@ const ClientTasksSection = ({
         onClick={closeTaskModal}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-elevated w-full max-w-lg mx-4">
+      {/* Modal - Figma styling */}
+      <div 
+        className="relative bg-white rounded-[16px] w-full max-w-[480px] mx-4 flex flex-col max-h-[90vh]"
+        style={{ 
+          boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.08), 0px 0px 2px 0px rgba(0, 0, 0, 0.16)' 
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[#E8E8E8]">
-          <h3 className="text-16 font-semibold text-[#18181A]">
-            {taskModalMode === 'add' ? 'Add Task' : taskModalMode === 'edit' ? 'Edit Task' : 'Task Details'}
-          </h3>
-          <div className="flex items-center gap-2">
-            {taskModalMode === 'view' && (
-              <button
-                onClick={switchToEditMode}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-12 font-medium text-[#656565] hover:text-[#18181A] hover:bg-[#F0F0F0] rounded-md transition-colors"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                Edit
-              </button>
-            )}
-            <button
-              onClick={closeTaskModal}
-              className="p-1.5 rounded-md text-[#8D8D8D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E8E8]">
+          <span className="text-14 font-medium text-[#736F6D]">
+            {taskModalMode === 'add' ? 'Create Task' : selectedTaskIsReview ? 'Review Item' : 'Task Details'}
+          </span>
+          <button
+            onClick={closeTaskModal}
+            className="p-1.5 rounded-md text-[#736F6D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
         
-        {/* Body */}
-        <div className="p-5 space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-12 font-medium text-[#656565] mb-1.5">Title</label>
+        {/* Show placeholder for review tasks in view mode */}
+        {selectedTaskIsReview && taskModalMode === 'view' ? (
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#F5F5F5] flex items-center justify-center mb-4">
+              <ThumbsUp className="w-8 h-8 text-[#BFBCBA]" />
+            </div>
+            <h3 className="text-18 font-semibold text-[#18181A] mb-2">{taskForm.title}</h3>
+            <p className="text-14 text-[#736F6D] max-w-xs">
+              Review feedback view coming soon. Use the action buttons in the task list to approve or request changes.
+            </p>
+            <button
+              onClick={closeTaskModal}
+              className="mt-6 px-5 py-2.5 text-13 font-medium text-white bg-[#4D5FFF] rounded-lg
+                hover:bg-[#4555E3] transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        ) : (
+        <>
+        {/* Body - Scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          {/* Task Title - Large and prominent */}
+          <div className="mb-6">
             {taskModalMode === 'view' ? (
-              <p className="text-14 text-[#18181A]">{taskForm.title}</p>
+              <h2 className="text-24 font-semibold text-[#18181A] leading-tight">
+                {taskForm.title}
+              </h2>
             ) : (
               <input
                 type="text"
                 value={taskForm.title}
                 onChange={(e) => handleTaskFormChange('title', e.target.value)}
                 placeholder="Enter task title"
-                className="w-full px-3 py-2 text-14 text-[#18181A] placeholder-[#8D8D8D]
-                  border border-[#E8E8E8] rounded-lg
-                  focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
+                className="w-full text-24 font-semibold text-[#18181A] placeholder-[#BFBCBA]
+                  px-3 py-2 -mx-3 rounded-lg
+                  border border-[#E8E8E8] bg-[#FAFAFA]
+                  focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF] focus:bg-white
                   transition-colors"
-                autoFocus={taskModalMode === 'add'}
+                autoFocus
               />
             )}
           </div>
 
-          {/* Due Date */}
-          <div>
-            <label className="block text-12 font-medium text-[#656565] mb-1.5">Due Date</label>
-            {taskModalMode === 'view' ? (
-              <div className="flex items-center gap-2 text-14 text-[#18181A]">
-                <Calendar className="w-4 h-4 text-[#8D8D8D]" />
-                {taskForm.dueDate ? new Date(taskForm.dueDate).toLocaleDateString('en-US', { 
-                  month: 'short', day: 'numeric', year: 'numeric' 
-                }) : 'No due date'}
+          {/* Fields Grid */}
+          <div className="space-y-4">
+            {/* Due Date Field */}
+            <div className="flex items-start gap-4">
+              <div className="flex items-center gap-2 w-28 flex-shrink-0 pt-2">
+                <Calendar className="w-4 h-4 text-[#736F6D]" />
+                <span className="text-14 text-[#736F6D]">Due Date</span>
               </div>
-            ) : (
-              <input
-                type="date"
-                value={taskForm.dueDate}
-                onChange={(e) => handleTaskFormChange('dueDate', e.target.value)}
-                className="w-full px-3 py-2 text-14 text-[#18181A]
-                  border border-[#E8E8E8] rounded-lg
-                  focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
-                  transition-colors"
-              />
-            )}
-          </div>
-
-          {/* Assignee */}
-          <div>
-            <label className="block text-12 font-medium text-[#656565] mb-1.5">Assignee</label>
-            {taskModalMode === 'view' ? (
-              <div className="flex items-center gap-2 text-14 text-[#18181A]">
-                <User className="w-4 h-4 text-[#8D8D8D]" />
-                {taskForm.assigneeName || 'Unassigned'}
+              <div className="flex-1">
+                {taskModalMode === 'view' ? (
+                  <div className="px-3 py-2 rounded-lg bg-white text-14 text-[rgba(43,40,39,0.9)]">
+                    {taskForm.dueDate ? new Date(taskForm.dueDate).toLocaleDateString('en-US', { 
+                      weekday: 'short', day: 'numeric', month: 'short'
+                    }) : 'No due date'}
+                  </div>
+                ) : (
+                  <input
+                    type="date"
+                    value={taskForm.dueDate}
+                    onChange={(e) => handleTaskFormChange('dueDate', e.target.value)}
+                    className="w-full px-3 py-2 text-14 text-[rgba(43,40,39,0.9)]
+                      border border-[#E8E8E8] rounded-lg bg-white
+                      focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
+                      transition-colors"
+                  />
+                )}
               </div>
-            ) : (
-              <select
-                value={taskForm.assigneeName}
-                onChange={(e) => handleTaskFormChange('assigneeName', e.target.value)}
-                className="w-full px-3 py-2 text-14 text-[#18181A]
-                  border border-[#E8E8E8] rounded-lg bg-white
-                  focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
-                  transition-colors"
-              >
-                <option value="">Select assignee</option>
-                {allAssigneeNames.map(name => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-            )}
-          </div>
+            </div>
 
-          {/* Milestone */}
-          <div>
-            <label className="block text-12 font-medium text-[#656565] mb-1.5">Milestone (optional)</label>
-            {taskModalMode === 'view' ? (
-              <p className="text-14 text-[#18181A]">
-                {allMilestones.find(m => m.id === taskForm.milestoneId)?.name || 'No milestone'}
-              </p>
-            ) : (
-              <select
-                value={taskForm.milestoneId}
-                onChange={(e) => handleTaskFormChange('milestoneId', e.target.value)}
-                className="w-full px-3 py-2 text-14 text-[#18181A]
-                  border border-[#E8E8E8] rounded-lg bg-white
-                  focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
-                  transition-colors"
-              >
-                <option value="">No milestone</option>
-                {allMilestones.map(m => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
-              </select>
-            )}
+            {/* Assignee Field */}
+            <div className="flex items-start gap-4">
+              <div className="flex items-center gap-2 w-28 flex-shrink-0 pt-2">
+                <User className="w-4 h-4 text-[#736F6D]" />
+                <span className="text-14 text-[#736F6D]">Assign</span>
+              </div>
+              <div className="flex-1">
+                {taskModalMode === 'view' ? (
+                  <div className="flex items-center gap-2">
+                    {taskForm.assigneeName ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#E8E8E8] text-14 text-[rgba(43,40,39,0.9)]">
+                        <span className="w-2 h-2 rounded-full bg-[#4D5FFF]"></span>
+                        {taskForm.assigneeName}
+                      </span>
+                    ) : (
+                      <span className="text-14 text-[#BFBCBA]">Unassigned</span>
+                    )}
+                  </div>
+                ) : (
+                  <SearchableSelect
+                    value={taskForm.assigneeName}
+                    options={allAssigneeNames}
+                    onChange={(val) => handleTaskFormChange('assigneeName', val)}
+                    placeholder="Search assignee..."
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Milestone Field */}
+            <div className="flex items-start gap-4">
+              <div className="flex items-center gap-2 w-28 flex-shrink-0 pt-2">
+                <Target className="w-4 h-4 text-[#736F6D]" />
+                <span className="text-14 text-[#736F6D]">Milestone</span>
+              </div>
+              <div className="flex-1">
+                {taskModalMode === 'view' ? (
+                  <div className="px-3 py-2 rounded-lg bg-white text-14 text-[rgba(43,40,39,0.9)]">
+                    {allMilestones.find(m => m.id === taskForm.milestoneId)?.name || 
+                      <span className="text-[#BFBCBA]">No milestone</span>
+                    }
+                  </div>
+                ) : (
+                  <SearchableSelect
+                    value={taskForm.milestoneId}
+                    options={allMilestones}
+                    onChange={(val) => handleTaskFormChange('milestoneId', val)}
+                    placeholder="Search milestone..."
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Description Field */}
+            <div className="flex items-start gap-4">
+              <div className="flex items-center gap-2 w-28 flex-shrink-0 pt-2">
+                <FileText className="w-4 h-4 text-[#736F6D]" />
+                <span className="text-14 text-[#736F6D]">Description</span>
+              </div>
+              <div className="flex-1">
+                {taskModalMode === 'view' ? (
+                  <div className="px-3 py-2 rounded-lg bg-white text-14 text-[rgba(43,40,39,0.9)] leading-relaxed whitespace-pre-wrap">
+                    {taskForm.description || <span className="text-[#BFBCBA]">No description</span>}
+                  </div>
+                ) : (
+                  <textarea
+                    value={taskForm.description}
+                    onChange={(e) => handleTaskFormChange('description', e.target.value)}
+                    placeholder="Add a description or subtasks (use - [ ] for checkboxes)"
+                    rows={4}
+                    className="w-full px-3 py-2 text-14 text-[rgba(43,40,39,0.9)] placeholder-[#BFBCBA]
+                      border border-[#E8E8E8] rounded-lg bg-white resize-none leading-relaxed
+                      focus:outline-none focus:ring-2 focus:ring-[#4D5FFF]/20 focus:border-[#4D5FFF]
+                      transition-colors"
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
         
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 p-5 pt-0">
-          <button
-            onClick={closeTaskModal}
-            className="px-4 py-2 text-13 font-medium text-[#656565] hover:text-[#18181A] transition-colors"
-          >
-            {taskModalMode === 'view' ? 'Close' : 'Cancel'}
-          </button>
-          {taskModalMode !== 'view' && (
-            <button
-              onClick={saveTask}
-              disabled={!taskForm.title.trim()}
-              className="px-4 py-2 text-13 font-medium text-white bg-[#4D5FFF] rounded-lg
-                hover:bg-[#4555E3] disabled:opacity-50 disabled:cursor-not-allowed
-                transition-colors"
-            >
-              {taskModalMode === 'add' ? 'Add Task' : 'Save Changes'}
-            </button>
+        {/* Footer - Action Buttons */}
+        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-[#E8E8E8]">
+          {taskModalMode === 'view' ? (
+            <>
+              {/* Left side - Edit button */}
+              <button
+                onClick={switchToEditMode}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-13 font-medium text-[#656565] 
+                  bg-white border border-[#E8E8E8] rounded-lg
+                  hover:bg-[#F5F5F5] hover:text-[#18181A] transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                Edit
+              </button>
+              
+              {/* Right side - Action buttons */}
+              <div className="flex items-center gap-2">
+                {/* Help button */}
+                {selectedTask && (
+                  <button
+                    onClick={() => {
+                      closeTaskModal()
+                      handleHelpButtonClick(selectedTask)
+                    }}
+                    className={`p-2.5 rounded-lg transition-colors
+                      ${selectedTask.needsAttention 
+                        ? 'text-[#4D5FFF] bg-[#EEF0FF] hover:bg-[#DFE9FF]' 
+                        : 'text-[#736F6D] bg-white border border-[#E8E8E8] hover:bg-[#F5F5F5]'
+                      }`}
+                    title={selectedTask.needsAttention ? 'Cancel help request' : 'Need help?'}
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                  </button>
+                )}
+                
+                {/* Mark Done / Review button */}
+                {selectedTask && selectedTask.status === 'active' && (
+                  selectedTaskIsReview ? (
+                    <div className="inline-flex rounded-lg overflow-hidden border border-[#E8E8E8]">
+                      <button
+                        onClick={() => {
+                          handleApprove(selectedTask)
+                          closeTaskModal()
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 text-13 font-medium
+                          bg-[#E9F8E5] text-[#2A531E] hover:bg-[#D4F0CE] transition-colors"
+                      >
+                        <ThumbsUp className="w-4 h-4" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleRequestChange(selectedTask)
+                          closeTaskModal()
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 text-13 font-medium
+                          bg-[#FCECE7] text-[#D71723] border-l border-[#E8E8E8] hover:bg-[#F9DCD4] transition-colors"
+                      >
+                        <ThumbsDown className="w-4 h-4" />
+                        Revise
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        handleMarkDone(selectedTask)
+                        closeTaskModal()
+                      }}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-13 font-medium 
+                        bg-[#E9F8E5] text-[#2A531E] border border-[#CDE8C2]
+                        hover:bg-[#D4F0CE] transition-colors"
+                    >
+                      <Check className="w-4 h-4" />
+                      Mark Done
+                    </button>
+                  )
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Edit/Add mode buttons */}
+              <div></div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={closeTaskModal}
+                  className="px-4 py-2 text-13 font-medium text-[#656565] hover:text-[#18181A] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveTask}
+                  disabled={!taskForm.title.trim()}
+                  className="px-5 py-2.5 text-13 font-medium text-white bg-[#4D5FFF] rounded-lg
+                    hover:bg-[#4555E3] disabled:opacity-50 disabled:cursor-not-allowed
+                    transition-colors"
+                >
+                  {taskModalMode === 'add' ? 'Add Task' : 'Save Changes'}
+                </button>
+              </div>
+            </>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
   ) : null
@@ -579,21 +833,19 @@ const ClientTasksSection = ({
     
     return (
       <tr
+        onClick={() => openTaskModal(task)}
         className={`
           ${!isLast ? 'border-b border-[#F0F0F0]' : ''}
           ${overdue && isActiveView ? 'border-l-4 border-l-[#F13B3B]' : ''}
-          hover:bg-[#FAFAFA] transition-colors duration-[120ms]
+          hover:bg-[#FAFAFA] transition-colors duration-[120ms] cursor-pointer
         `}
       >
         {/* Task Column */}
         <td className={`px-4 py-3 ${overdue && isActiveView ? 'pl-3' : ''}`}>
           <div className="flex items-center gap-2 flex-wrap">
-            <button 
-              onClick={() => openTaskModal(task)}
-              className="text-13 text-[#3D3D3F] hover:text-[#4D5FFF] hover:underline text-left transition-colors"
-            >
+            <span className="text-13 text-[#3D3D3F]">
               {task.title}
-            </button>
+            </span>
             {/* Show Help Requested OR Blocks Milestone, not both */}
             {task.needsAttention ? (
               <HelpRequestedBadge />
@@ -623,7 +875,7 @@ const ClientTasksSection = ({
                   <ReviewButton task={task} />
                 ) : (
                   <button
-                    onClick={() => handleMarkDone(task)}
+                    onClick={(e) => { e.stopPropagation(); handleMarkDone(task); }}
                     className="inline-flex items-center justify-center gap-2 w-[200px] py-2.5 rounded-md text-12 font-medium 
                       bg-[#F5F5F5] text-[#717171] border border-[#E8E8E8]
                       hover:bg-[#E9F8E5] hover:text-[#2A531E] hover:border-[#CDE8C2]
@@ -637,7 +889,7 @@ const ClientTasksSection = ({
                 {/* Help button - opens modal or cancels request */}
                 <div className="relative group">
                   <button
-                    onClick={() => handleHelpButtonClick(task)}
+                    onClick={(e) => { e.stopPropagation(); handleHelpButtonClick(task); }}
                     className={`p-2 rounded-md transition-colors duration-[120ms]
                       ${task.needsAttention 
                         ? 'text-[#4D5FFF] bg-[#EEF0FF] hover:bg-[#DFE9FF]' 

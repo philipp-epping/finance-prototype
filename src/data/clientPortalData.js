@@ -14,10 +14,10 @@ export const clientProject = {
       name: 'Discovery & Strategy',
       status: 'completed',
       tasks: [
-        { id: 't-1', title: 'Fill out brand questionnaire', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-01-20', blocksMilestone: false, needsAttention: false },
-        { id: 't-2', title: 'Provide access to existing analytics', assignee: 'client', assigneeName: 'Mike Johnson', status: 'completed', dueDate: '2026-01-22', blocksMilestone: false, needsAttention: false },
-        { id: 't-3', title: 'Conduct stakeholder interviews', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'completed', dueDate: '2026-01-25', blocksMilestone: false, needsAttention: false },
-        { id: 't-4', title: 'Review and approve strategy document', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-01-28', blocksMilestone: false, needsAttention: false },
+        { id: 't-1', title: 'Fill out brand questionnaire', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-01-20', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-2', title: 'Provide access to existing analytics', assignee: 'client', assigneeName: 'Mike Johnson', status: 'completed', dueDate: '2026-01-22', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-3', title: 'Conduct stakeholder interviews', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'completed', dueDate: '2026-01-25', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-4', title: 'Review and approve strategy document', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-01-28', blocksMilestone: false, needsAttention: false, description: '' },
       ]
     },
     {
@@ -25,12 +25,12 @@ export const clientProject = {
       name: 'Design Phase',
       status: 'in_progress',
       tasks: [
-        { id: 't-5', title: 'Create wireframes for key pages', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'completed', dueDate: '2026-01-30', blocksMilestone: false, needsAttention: false },
-        { id: 't-6', title: 'Review wireframes and provide feedback', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-02-01', blocksMilestone: false, needsAttention: false },
-        { id: 't-7', title: 'Design homepage mockup', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'completed', dueDate: '2026-02-03', blocksMilestone: false, needsAttention: false },
-        { id: 't-8', title: 'Design inner page templates', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-05', blocksMilestone: false, needsAttention: false },
-        { id: 't-9', title: 'Review and approve final designs', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-01-31', blocksMilestone: true, needsAttention: false },
-        { id: 't-10', title: 'Provide high-res logo and brand assets', assignee: 'client', assigneeName: 'Mike Johnson', status: 'active', dueDate: '2026-02-07', blocksMilestone: true, needsAttention: false },
+        { id: 't-5', title: 'Create wireframes for key pages', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'completed', dueDate: '2026-01-30', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-6', title: 'Review wireframes and provide feedback', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-02-01', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-7', title: 'Design homepage mockup', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'completed', dueDate: '2026-02-03', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-8', title: 'Design inner page templates', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-05', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-9', title: 'Review and approve final designs', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-01-31', blocksMilestone: true, needsAttention: false, description: 'Please review the homepage and inner page designs.\n\n- [ ] Check color consistency\n- [ ] Verify mobile responsiveness\n- [ ] Confirm CTA placements' },
+        { id: 't-10', title: 'Provide high-res logo and brand assets', assignee: 'client', assigneeName: 'Mike Johnson', status: 'active', dueDate: '2026-02-07', blocksMilestone: true, needsAttention: false, description: 'We need the following assets:\n\n- [ ] Logo in SVG format\n- [ ] Brand color codes\n- [ ] Typography guidelines' },
       ]
     },
     {
@@ -38,11 +38,11 @@ export const clientProject = {
       name: 'Development',
       status: 'upcoming',
       tasks: [
-        { id: 't-11', title: 'Set up development environment', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-10', blocksMilestone: false, needsAttention: false },
-        { id: 't-12', title: 'Build responsive frontend', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-20', blocksMilestone: false, needsAttention: false },
-        { id: 't-13', title: 'Integrate CMS', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-25', blocksMilestone: false, needsAttention: false },
-        { id: 't-14', title: 'Provide content for all pages', assignee: 'client', assigneeName: 'Emily Watson', status: 'backlog', dueDate: '2026-02-28', blocksMilestone: true, needsAttention: false },
-        { id: 't-15', title: 'Review staging site', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-05', blocksMilestone: false, needsAttention: false },
+        { id: 't-11', title: 'Set up development environment', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-10', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-12', title: 'Build responsive frontend', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-20', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-13', title: 'Integrate CMS', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-25', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-14', title: 'Provide content for all pages', assignee: 'client', assigneeName: 'Emily Watson', status: 'backlog', dueDate: '2026-02-28', blocksMilestone: true, needsAttention: false, description: 'Content needed for the following pages:\n\n- [ ] Homepage hero text\n- [ ] About Us page\n- [ ] Services descriptions\n- [ ] Contact information' },
+        { id: 't-15', title: 'Review staging site', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-05', blocksMilestone: false, needsAttention: false, description: '' },
       ]
     },
     {
@@ -50,10 +50,10 @@ export const clientProject = {
       name: 'Launch & Handoff',
       status: 'upcoming',
       tasks: [
-        { id: 't-16', title: 'Final QA and bug fixes', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-10', blocksMilestone: false, needsAttention: false },
-        { id: 't-17', title: 'Final review and sign-off', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-12', blocksMilestone: true, needsAttention: false },
-        { id: 't-18', title: 'Deploy to production', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-15', blocksMilestone: false, needsAttention: false },
-        { id: 't-19', title: 'Handoff documentation and training', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-03-18', blocksMilestone: false, needsAttention: false },
+        { id: 't-16', title: 'Final QA and bug fixes', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-10', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-17', title: 'Final review and sign-off', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-12', blocksMilestone: true, needsAttention: false, description: '' },
+        { id: 't-18', title: 'Deploy to production', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-15', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-19', title: 'Handoff documentation and training', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-03-18', blocksMilestone: false, needsAttention: false, description: '' },
       ]
     }
   ]
