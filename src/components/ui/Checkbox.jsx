@@ -21,17 +21,17 @@ const Checkbox = ({
           disabled={disabled}
           className="sr-only peer"
         />
-        {/* Checkbox: 12x12px, 3px border radius from Figma */}
-        <div className={`w-3 h-3 rounded-checkbox border transition-all duration-[120ms] flex items-center justify-center ${
+        {/* Checkbox: 16x16px, 4px border radius - larger squared style */}
+        <div className={`w-4 h-4 rounded-[4px] border transition-all duration-[120ms] flex items-center justify-center ${
           isActive 
             ? 'bg-[#4D5FFF] border-[#4D5FFF]' 
             : 'bg-white border-[#D9D9D9] hover:bg-[#F0F0F0]'
         } ${disabled && isActive ? 'bg-[#D9D9D9] border-[#D9D9D9]' : ''}`}>
           {indeterminate && !checked && (
-            <Minus className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+            <Minus className="w-3 h-3 text-white" strokeWidth={3} />
           )}
           {checked && (
-            <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+            <Check className="w-3 h-3 text-white" strokeWidth={3} />
           )}
         </div>
       </div>

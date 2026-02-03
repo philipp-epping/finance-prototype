@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, ThumbsUp, ThumbsDown, Check, CheckCircle2, MessageCircle, Clock, ChevronLeft, ChevronRight, Play, Pause, ZoomIn, ZoomOut } from 'lucide-react'
+import { X, ThumbsUp, ThumbsDown, Check, CheckCircle2, MessageCircle, Clock, ChevronLeft, ChevronRight, Play, Pause, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react'
 
 // Helper to format relative time
 const formatRelativeTime = (dateString) => {
@@ -146,11 +146,16 @@ const getEmojiChar = (emojiId) => {
 }
 
 // Video Viewer Component - Loom-style UX
+// Playback speed options
+const PLAYBACK_SPEEDS = [0.5, 1, 1.5, 2, 2.5, 3]
+
 const VideoViewer = ({ asset, comments, activeCommentId, onCommentClick, pendingAnchor, videoRef, reactions, onAddReaction }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [hoveredReaction, setHoveredReaction] = useState(null)
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false)
   
   useEffect(() => {
     const video = videoRef.current
@@ -207,18 +212,33 @@ const VideoViewer = ({ asset, comments, activeCommentId, onCommentClick, pending
     onCommentClick({ type: 'video', assetId: asset.id, timestamp })
   }
   
+  // Handle playback speed change
+  const handleSpeedChange = (speed) => {
+    setPlaybackSpeed(speed)
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed
+    }
+  }
+  
   // Filter reactions for this asset
   const assetReactions = reactions?.filter(r => r.assetId === asset.id || !r.assetId) || []
+  
+  // Check if video is vertical (9:16 aspect ratio)
+  const isVertical = asset.aspectRatio === '9:16'
   
   return (
     <div className="flex-1 flex flex-col">
       {/* Video Container */}
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="relative max-w-full">
+        <div className={`relative ${isVertical ? 'max-w-[300px]' : 'max-w-full'}`}>
           <video
             ref={videoRef}
             src={asset.url}
-            className="max-w-full max-h-[55vh] rounded-lg shadow-lg cursor-pointer"
+            className={`rounded-lg shadow-lg cursor-pointer ${
+              isVertical 
+                ? 'h-[55vh] w-auto' 
+                : 'max-w-full max-h-[55vh]'
+            }`}
             onClick={handleVideoClick}
           />
           
@@ -270,10 +290,21 @@ const VideoViewer = ({ asset, comments, activeCommentId, onCommentClick, pending
             <span className="text-12 text-[#8D8D8D] min-w-[80px]">
               {formatTimestamp(currentTime)} / {formatTimestamp(duration || 0)}
             </span>
-            <div className="flex-1 h-2 bg-[#333] rounded-full overflow-visible relative">
+            <div 
+              className="flex-1 h-2 bg-[#333] rounded-full overflow-visible relative cursor-pointer"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                const clickX = e.clientX - rect.left
+                const percent = clickX / rect.width
+                const seekTime = percent * duration
+                if (videoRef.current && duration) {
+                  videoRef.current.currentTime = seekTime
+                }
+              }}
+            >
               {/* Progress fill */}
               <div 
-                className="absolute inset-y-0 left-0 bg-[#4D5FFF] rounded-full transition-all"
+                className="absolute inset-y-0 left-0 bg-[#4D5FFF] rounded-full transition-all pointer-events-none"
                 style={{ width: duration ? `${(currentTime / duration) * 100}%` : '0%' }}
               />
               
@@ -306,6 +337,48 @@ const VideoViewer = ({ asset, comments, activeCommentId, onCommentClick, pending
               })}
             </div>
             
+            {/* Playback Speed Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                className="px-2 py-1 rounded text-11 font-medium text-[#8D8D8D] hover:text-white hover:bg-[#333] transition-colors flex items-center gap-1"
+              >
+                {playbackSpeed}x
+                <ChevronRight className={`w-3 h-3 transition-transform ${showSpeedMenu ? 'rotate-90' : ''}`} />
+              </button>
+              
+              {showSpeedMenu && (
+                <>
+                  {/* Backdrop to close menu */}
+                  <div 
+                    className="fixed inset-0 z-10" 
+                    onClick={() => setShowSpeedMenu(false)}
+                  />
+                  
+                  {/* Dropdown menu */}
+                  <div className="absolute bottom-full right-0 mb-1 bg-[#242424] border border-[#333] rounded-lg shadow-lg overflow-hidden z-20">
+                    {PLAYBACK_SPEEDS.map((speed) => (
+                      <button
+                        key={speed}
+                        onClick={() => {
+                          handleSpeedChange(speed)
+                          setShowSpeedMenu(false)
+                        }}
+                        className={`w-full px-4 py-1.5 text-11 font-medium text-left flex items-center justify-between gap-3 transition-colors
+                          ${playbackSpeed === speed
+                            ? 'bg-[#4D5FFF] text-white'
+                            : 'text-[#8D8D8D] hover:text-white hover:bg-[#333]'
+                          }`}
+                      >
+                        {speed}x
+                        {playbackSpeed === speed && <Check className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            
             {/* Show pending anchor timestamp */}
             {pendingAnchor && pendingAnchor.assetId === asset.id && (
               <span className="text-12 text-[#4D5FFF] flex items-center gap-1">
@@ -331,14 +404,14 @@ const VideoViewer = ({ asset, comments, activeCommentId, onCommentClick, pending
               ))}
             </div>
             
-            {/* Comment button */}
+            {/* Request Changes button */}
             <button
               onClick={handleCommentButtonClick}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-13 font-medium
-                bg-[#4D5FFF] text-white hover:bg-[#4555E3] transition-colors"
+                bg-[#D71723] text-white hover:bg-[#B8131E] transition-colors"
             >
-              <MessageCircle className="w-4 h-4" />
-              Comment
+              <MessageCircle className="w-[18px] h-[18px]" />
+              Request Changes
             </button>
           </div>
         </div>
@@ -454,7 +527,7 @@ const CommentItem = ({ comment, index, isActive, onClick, onToggleResolved, onSe
         {/* Resolved toggle */}
         <button
           onClick={(e) => { e.stopPropagation(); onToggleResolved(comment.id); }}
-          className={`p-1.5 rounded-md transition-colors flex-shrink-0
+          className={`w-8 h-8 rounded-md transition-colors flex-shrink-0 flex items-center justify-center
             ${comment.resolved 
               ? 'text-[#50942A] bg-[#E9F8E5] hover:bg-[#D4F0CE]' 
               : 'text-[#8D8D8D] hover:text-[#50942A] hover:bg-[#E9F8E5]'
@@ -462,9 +535,9 @@ const CommentItem = ({ comment, index, isActive, onClick, onToggleResolved, onSe
           title={comment.resolved ? 'Mark as unresolved' : 'Mark as resolved'}
         >
           {comment.resolved ? (
-            <CheckCircle2 className="w-4 h-4" />
+            <CheckCircle2 className="w-[16px] h-[16px]" />
           ) : (
-            <Check className="w-4 h-4" />
+            <Check className="w-[16px] h-[16px]" />
           )}
         </button>
       </div>
@@ -561,13 +634,19 @@ const ReviewModal = ({
   onApprove, 
   onRequestChanges,
   onAddComment,
-  onToggleResolved
+  onToggleResolved,
+  // Queue props
+  queueIndex = 0,
+  queueTotal = 1,
+  onNext,
+  onPrevious
 }) => {
   const [activeAssetIndex, setActiveAssetIndex] = useState(0)
   const [activeCommentId, setActiveCommentId] = useState(null)
   const [pendingAnchor, setPendingAnchor] = useState(null)
   const [comments, setComments] = useState(task.comments || [])
   const [reactions, setReactions] = useState(task.reactions || [])
+  const [activeCommentTab, setActiveCommentTab] = useState('unresolved')
   const videoRef = useRef(null)
   
   const assets = task.assets || []
@@ -721,20 +800,46 @@ const ReviewModal = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E8E8]">
-          <div className="flex items-center gap-3">
-            <h2 className="text-16 font-semibold text-[#18181A]">{task.title}</h2>
-            {unresolvedCount > 0 && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-11 font-medium bg-[#FCF2E7] text-[#42301C]">
-                {unresolvedCount} unresolved
+          <h2 className="text-16 font-semibold text-[#18181A]">{task.title}</h2>
+          
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            {queueTotal > 1 && (
+              <button
+                onClick={onPrevious}
+                disabled={queueIndex === 0}
+                className="p-2.5 rounded-lg text-[#8D8D8D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+            
+            {/* Queue progress indicator */}
+            {queueTotal > 1 && (
+              <span className="text-13 text-[#8D8D8D] min-w-[50px] text-center">
+                {queueIndex + 1} of {queueTotal}
               </span>
             )}
+            
+            {/* Next button */}
+            {queueTotal > 1 && (
+              <button
+                onClick={onNext}
+                disabled={queueIndex === queueTotal - 1}
+                className="p-2.5 rounded-lg text-[#8D8D8D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+            
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg text-[#8D8D8D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg text-[#8D8D8D] hover:text-[#18181A] hover:bg-[#F0F0F0] transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
         
         {/* Content - Split View */}
@@ -798,39 +903,70 @@ const ReviewModal = ({
           
           {/* Right Panel - Comments (30%) */}
           <div className="w-[30%] flex flex-col border-l border-[#E8E8E8] bg-white">
-            {/* Comments Header */}
+            {/* Comments Tabs */}
             <div className="px-4 py-3 border-b border-[#E8E8E8]">
-              <div className="flex items-center justify-between">
-                <span className="text-13 font-medium text-[#18181A]">
-                  Comments ({comments.length})
-                </span>
-                <span className="text-11 text-[#8D8D8D]">
-                  {unresolvedCount} open
-                </span>
+              <div className="flex items-center gap-1 bg-[#F5F5F5] rounded-lg p-1">
+                <button
+                  onClick={() => setActiveCommentTab('unresolved')}
+                  className={`flex-1 px-3 py-1.5 rounded-md text-13 font-medium transition-colors
+                    ${activeCommentTab === 'unresolved'
+                      ? 'bg-white text-[#18181A] shadow-sm'
+                      : 'text-[#656565] hover:text-[#18181A]'
+                    }`}
+                >
+                  Unresolved ({unresolvedCount})
+                </button>
+                <button
+                  onClick={() => setActiveCommentTab('resolved')}
+                  className={`flex-1 px-3 py-1.5 rounded-md text-13 font-medium transition-colors
+                    ${activeCommentTab === 'resolved'
+                      ? 'bg-white text-[#18181A] shadow-sm'
+                      : 'text-[#656565] hover:text-[#18181A]'
+                    }`}
+                >
+                  Resolved ({comments.length - unresolvedCount})
+                </button>
               </div>
             </div>
             
             {/* Comments List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {comments.length === 0 && !pendingAnchor && (
-                <div className="text-center py-8">
-                  <MessageCircle className="w-8 h-8 text-[#E8E8E8] mx-auto mb-2" />
-                  <p className="text-13 text-[#8D8D8D]">No comments yet</p>
-                  <p className="text-12 text-[#BBBBBB] mt-1">Click on the asset to add a comment</p>
-                </div>
-              )}
-              
-              {comments.map((comment, idx) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  index={idx}
-                  isActive={activeCommentId === comment.id}
-                  onClick={() => handleCommentClick(comment)}
-                  onToggleResolved={handleToggleResolved}
-                  onSeekToTimestamp={handleSeekToTimestamp}
-                />
-              ))}
+              {(() => {
+                const filteredComments = activeCommentTab === 'unresolved'
+                  ? comments.filter(c => !c.resolved)
+                  : comments.filter(c => c.resolved)
+                
+                if (filteredComments.length === 0 && !pendingAnchor) {
+                  return (
+                    <div className="text-center py-8">
+                      {activeCommentTab === 'unresolved' ? (
+                        <>
+                          <CheckCircle2 className="w-8 h-8 text-[#22C55E] mx-auto mb-2" />
+                          <p className="text-13 text-[#8D8D8D]">Ready for your review</p>
+                          <p className="text-12 text-[#BBBBBB] mt-1">Approve if everything looks good</p>
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-8 h-8 text-[#E8E8E8] mx-auto mb-2" />
+                          <p className="text-13 text-[#8D8D8D]">No resolved comments</p>
+                        </>
+                      )}
+                    </div>
+                  )
+                }
+                
+                return filteredComments.map((comment, idx) => (
+                  <CommentItem
+                    key={comment.id}
+                    comment={comment}
+                    index={idx}
+                    isActive={activeCommentId === comment.id}
+                    onClick={() => handleCommentClick(comment)}
+                    onToggleResolved={handleToggleResolved}
+                    onSeekToTimestamp={handleSeekToTimestamp}
+                  />
+                ))
+              })()}
               
               {/* Comment Input */}
               <CommentInput
@@ -842,26 +978,69 @@ const ReviewModal = ({
             
             {/* Actions Footer */}
             <div className="px-4 py-4 border-t border-[#E8E8E8] bg-[#FAFAFA]">
-              <div className="flex items-center gap-2">
+              {unresolvedCount === 0 ? (
+                /* No changes requested - show Approve button */
                 <button
-                  onClick={onRequestChanges}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-13 font-medium
-                    bg-[#FCECE7] text-[#D71723] rounded-lg border border-[#F9DCD4]
-                    hover:bg-[#F9DCD4] transition-colors"
+                  onClick={() => {
+                    if (onApprove) onApprove()
+                    // Auto-advance to next item or close if last
+                    if (queueIndex < queueTotal - 1 && onNext) {
+                      onNext()
+                    } else {
+                      onClose()
+                    }
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-14 font-medium
+                    bg-[#22C55E] text-white rounded-lg
+                    hover:bg-[#16A34A] transition-colors"
                 >
-                  <ThumbsDown className="w-4 h-4" />
-                  Request Changes
-                </button>
-                <button
-                  onClick={onApprove}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-13 font-medium
-                    bg-[#E9F8E5] text-[#2A531E] rounded-lg border border-[#CDE8C2]
-                    hover:bg-[#D4F0CE] transition-colors"
-                >
-                  <ThumbsUp className="w-4 h-4" />
+                  <ThumbsUp className="w-5 h-5" />
                   Approve
                 </button>
-              </div>
+              ) : (
+                /* Changes requested - show Auto Approve / Review Again options */
+                <div className="space-y-3">
+                  <p className="text-12 text-[#656565] text-center">Once changes are applied</p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        // Auto approve means when changes are applied, auto-approve
+                        if (onRequestChanges) onRequestChanges({ autoApprove: true })
+                        // Auto-advance to next item or close if last
+                        if (queueIndex < queueTotal - 1 && onNext) {
+                          onNext()
+                        } else {
+                          onClose()
+                        }
+                      }}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-13 font-medium
+                        bg-[#E9F8E5] text-[#22C55E] rounded-lg border border-[#BBE9B0]
+                        hover:bg-[#D4F0CE] transition-colors"
+                    >
+                      <Check className="w-[18px] h-[18px]" />
+                      Auto Approve
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Review again means require another review after changes
+                        if (onRequestChanges) onRequestChanges({ reviewAgain: true })
+                        // Auto-advance to next item or close if last
+                        if (queueIndex < queueTotal - 1 && onNext) {
+                          onNext()
+                        } else {
+                          onClose()
+                        }
+                      }}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-13 font-medium
+                        bg-[#FEF3C7] text-[#D97706] rounded-lg border border-[#FDE68A]
+                        hover:bg-[#FDE68A] transition-colors"
+                    >
+                      <RefreshCw className="w-[18px] h-[18px]" />
+                      Review Again
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

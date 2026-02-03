@@ -8,11 +8,45 @@ export const clientProject = {
   name: 'Website Redesign',
   client: 'Acme Corp',
   startDate: '2026-01-15',
+  // Standalone tasks - not attached to any milestone
+  standaloneTasks: [
+    { 
+      id: 'st-1', 
+      title: 'Update company bio on website', 
+      assignee: 'client', 
+      assigneeName: 'Sarah Chen',
+      status: 'active', 
+      dueDate: '2026-02-10',
+      needsAttention: false,
+      description: 'Please review and update the company bio text on the About page.'
+    },
+    { 
+      id: 'st-2', 
+      title: 'Sign updated contract addendum', 
+      assignee: 'client', 
+      assigneeName: 'Mike Johnson',
+      status: 'active', 
+      dueDate: '2026-02-15',
+      needsAttention: false,
+      description: 'Please review and sign the contract addendum for the additional landing pages.'
+    },
+    { 
+      id: 'st-3', 
+      title: 'Provide testimonials for homepage', 
+      assignee: 'client', 
+      assigneeName: 'Emily Watson',
+      status: 'completed', 
+      dueDate: '2026-01-25',
+      needsAttention: false,
+      description: 'We need 3-5 customer testimonials with photos for the homepage.'
+    },
+  ],
   roadmap: [
     {
       id: 'ms-1',
       name: 'Discovery & Strategy',
       status: 'completed',
+      estimatedDuration: '2 weeks',
       tasks: [
         { id: 't-1', title: 'Fill out brand questionnaire', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-01-20', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-2', title: 'Provide access to existing analytics', assignee: 'client', assigneeName: 'Mike Johnson', status: 'completed', dueDate: '2026-01-22', blocksMilestone: false, needsAttention: false, description: '' },
@@ -24,11 +58,12 @@ export const clientProject = {
       id: 'ms-2',
       name: 'Design Phase',
       status: 'in_progress',
+      estimatedDuration: '3 weeks',
       tasks: [
         { id: 't-5', title: 'Create wireframes for key pages', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'completed', dueDate: '2026-01-30', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-6', title: 'Review wireframes and provide feedback', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-02-01', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-7', title: 'Design homepage mockup', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'completed', dueDate: '2026-02-03', blocksMilestone: false, needsAttention: false, description: '' },
-        { id: 't-8', title: 'Design inner page templates', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-05', blocksMilestone: false, needsAttention: false, description: '' },
+        { id: 't-8', title: 'Design inner page templates', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'completed', dueDate: '2026-02-05', needsAttention: false, description: '' },
         { 
           id: 't-9', 
           title: 'Review and approve final designs', 
@@ -36,7 +71,6 @@ export const clientProject = {
           assigneeName: 'Sarah Chen', 
           status: 'active', 
           dueDate: '2026-01-31', 
-          blocksMilestone: true, 
           needsAttention: false, 
           description: 'Please review the homepage and inner page designs.\n\n- [ ] Check color consistency\n- [ ] Verify mobile responsiveness\n- [ ] Confirm CTA placements',
           assets: [
@@ -70,21 +104,22 @@ export const clientProject = {
             }
           ]
         },
-        { id: 't-10', title: 'Provide high-res logo and brand assets', assignee: 'client', assigneeName: 'Mike Johnson', status: 'active', dueDate: '2026-02-07', blocksMilestone: true, needsAttention: false, description: 'We need the following assets:\n\n- [ ] Logo in SVG format\n- [ ] Brand color codes\n- [ ] Typography guidelines' },
+        { id: 't-10', title: 'Provide high-res logo and brand assets', assignee: 'client', assigneeName: 'Mike Johnson', status: 'active', dueDate: '2026-02-07', nonBlocking: true, needsAttention: false, description: 'We need the following assets:\n\n- [ ] Logo in SVG format\n- [ ] Brand color codes\n- [ ] Typography guidelines' },
       ]
     },
     {
       id: 'ms-3',
       name: 'Development',
       status: 'upcoming',
+      estimatedDuration: '4 weeks',
       tasks: [
         { id: 't-11', title: 'Set up development environment', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-10', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-12', title: 'Build responsive frontend', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-20', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-13', title: 'Integrate CMS', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-25', blocksMilestone: false, needsAttention: false, description: '' },
-        { id: 't-14', title: 'Provide content for all pages', assignee: 'client', assigneeName: 'Emily Watson', status: 'backlog', dueDate: '2026-02-28', blocksMilestone: true, needsAttention: false, description: 'Content needed for the following pages:\n\n- [ ] Homepage hero text\n- [ ] About Us page\n- [ ] Services descriptions\n- [ ] Contact information' },
+        { id: 't-14', title: 'Provide content for all pages', assignee: 'client', assigneeName: 'Emily Watson', status: 'backlog', dueDate: '2026-02-28', nonBlocking: true, needsAttention: false, description: 'Content needed for the following pages:\n\n- [ ] Homepage hero text\n- [ ] About Us page\n- [ ] Services descriptions\n- [ ] Contact information' },
         { 
           id: 't-15', 
-          title: 'Review staging site', 
+          title: 'Review Image Movie', 
           assignee: 'client', 
           assigneeName: 'Sarah Chen', 
           status: 'active', 
@@ -95,29 +130,56 @@ export const clientProject = {
           assets: [
             { id: 'a-3', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', name: 'Staging Site Walkthrough.mp4' }
           ],
-          comments: [
-            {
-              id: 'c-4',
-              author: 'Alex Rivera',
-              text: 'Here is a walkthrough of the staging site. Pay attention to the navigation transitions.',
-              createdAt: '2026-03-01T10:00:00Z',
-              resolved: false,
-              anchor: { type: 'video', assetId: 'a-3', timestamp: 14 }
-            },
-            {
-              id: 'c-5',
-              author: 'Alex Rivera',
-              text: 'The contact form validation is shown here.',
-              createdAt: '2026-03-01T10:05:00Z',
-              resolved: false,
-              anchor: { type: 'video', assetId: 'a-3', timestamp: 45 }
-            }
+          comments: [],
+          reactions: []
+        },
+        { 
+          id: 't-20', 
+          title: 'Review Social Media Reel', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-03-06', 
+          blocksMilestone: false, 
+          needsAttention: false, 
+          description: 'Please review this Instagram reel for our social media campaign.',
+          assets: [
+            { id: 'a-5', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', name: 'Instagram Reel.mp4', aspectRatio: '9:16' }
           ],
-          reactions: [
-            { id: 'r-1', emoji: 'heart', timestamp: 8, author: 'Sarah Chen', createdAt: '2026-03-02T14:20:00Z' },
-            { id: 'r-2', emoji: 'thumbsUp', timestamp: 22, author: 'Mike Johnson', createdAt: '2026-03-02T15:10:00Z' },
-            { id: 'r-3', emoji: 'fire', timestamp: 38, author: 'Sarah Chen', createdAt: '2026-03-02T14:25:00Z' }
-          ]
+          comments: [],
+          reactions: []
+        },
+        { 
+          id: 't-21', 
+          title: 'Review Product Demo', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-03-07', 
+          blocksMilestone: false, 
+          needsAttention: false, 
+          description: 'Please review the product demo video for the landing page.',
+          assets: [
+            { id: 'a-6', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', name: 'Product Demo.mp4' }
+          ],
+          comments: [],
+          reactions: []
+        },
+        { 
+          id: 't-22', 
+          title: 'Review Story Video', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-03-08', 
+          blocksMilestone: false, 
+          needsAttention: false, 
+          description: 'Please review this story format video for TikTok.',
+          assets: [
+            { id: 'a-7', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', name: 'TikTok Story.mp4', aspectRatio: '9:16' }
+          ],
+          comments: [],
+          reactions: []
         },
       ]
     },
@@ -125,6 +187,7 @@ export const clientProject = {
       id: 'ms-4',
       name: 'Launch & Handoff',
       status: 'upcoming',
+      estimatedDuration: '1 week',
       tasks: [
         { id: 't-16', title: 'Final QA and bug fixes', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-10', blocksMilestone: false, needsAttention: false, description: '' },
         { 
@@ -134,7 +197,6 @@ export const clientProject = {
           assigneeName: 'Sarah Chen', 
           status: 'active', 
           dueDate: '2026-03-12', 
-          blocksMilestone: true, 
           needsAttention: false, 
           description: 'Please review the final documentation and sign off on the project.',
           assets: [
@@ -184,20 +246,38 @@ export const groupTasksByAssignee = (tasks) => {
 export const isTaskCompleted = (task) => task.status === 'completed'
 
 // Helper function to get all pending client tasks (active status only)
+// Includes both milestone tasks and standalone tasks
 export const getPendingClientTasks = (project) => {
   const pendingTasks = []
   
+  // Milestone tasks
   project.roadmap.forEach(milestone => {
     milestone.tasks
       .filter(task => task.assignee === 'client' && task.status === 'active')
       .forEach(task => {
+        // Compute if this task is currently blocking the milestone
+        const blocksMilestone = isTaskBlockingMilestone(milestone, task.id)
         pendingTasks.push({
           ...task,
+          blocksMilestone,
           milestoneName: milestone.name,
           milestoneId: milestone.id
         })
       })
   })
+  
+  // Standalone tasks (never block milestones)
+  ;(project.standaloneTasks || [])
+    .filter(task => task.assignee === 'client' && task.status === 'active')
+    .forEach(task => {
+      pendingTasks.push({
+        ...task,
+        blocksMilestone: false,
+        isStandalone: true,
+        milestoneName: null,
+        milestoneId: null
+      })
+    })
   
   return pendingTasks
 }
@@ -262,8 +342,11 @@ export const getAllClientTasks = (project) => {
     milestone.tasks
       .filter(task => task.assignee === 'client')
       .forEach(task => {
+        // Compute if this task is currently blocking the milestone
+        const blocksMilestone = isTaskBlockingMilestone(milestone, task.id)
         allTasks.push({
           ...task,
+          blocksMilestone,
           milestoneName: milestone.name,
           milestoneId: milestone.id,
           milestoneStatus: milestone.status
@@ -272,6 +355,17 @@ export const getAllClientTasks = (project) => {
   })
   
   return allTasks
+}
+
+// Helper function to check if a task is blocking its milestone
+// A task blocks a milestone if it's the first uncompleted non-blocking task in the sequence
+export const isTaskBlockingMilestone = (milestone, taskId) => {
+  // Find the first uncompleted task that is NOT marked as nonBlocking
+  const firstBlockingTask = milestone.tasks.find(
+    task => task.status !== 'completed' && !task.nonBlocking
+  )
+  // This task blocks if it's the first blocking uncompleted task
+  return firstBlockingTask && firstBlockingTask.id === taskId
 }
 
 // Helper function to get tasks by status with optional assignee filter
@@ -288,8 +382,11 @@ export const getTasksByStatus = (project, statusFilter, assigneeFilter = null) =
         return matchesStatus && matchesAssignee
       })
       .forEach(task => {
+        // Compute if this task is currently blocking the milestone
+        const blocksMilestone = isTaskBlockingMilestone(milestone, task.id)
         tasks.push({
           ...task,
+          blocksMilestone,
           milestoneName: milestone.name,
           milestoneId: milestone.id,
           milestoneStatus: milestone.status
@@ -302,7 +399,24 @@ export const getTasksByStatus = (project, statusFilter, assigneeFilter = null) =
 
 // Helper function to get all tasks for a specific view
 // Combines status filter with "my tasks" (client only) or "all tasks"
+// Includes both milestone tasks and standalone tasks
 export const getTasksForView = (project, statusFilter, myTasksOnly = true) => {
   const assigneeFilter = myTasksOnly ? 'client' : null
-  return getTasksByStatus(project, statusFilter, assigneeFilter)
+  
+  // Get milestone tasks
+  const milestoneTasks = getTasksByStatus(project, statusFilter, assigneeFilter)
+  
+  // Get standalone tasks
+  const standaloneTasks = (project.standaloneTasks || [])
+    .filter(task => task.status === statusFilter)
+    .filter(task => !assigneeFilter || task.assignee === assigneeFilter)
+    .map(task => ({ 
+      ...task, 
+      isStandalone: true,
+      milestoneName: null,
+      milestoneId: null,
+      milestoneStatus: null
+    }))
+  
+  return [...milestoneTasks, ...standaloneTasks]
 }

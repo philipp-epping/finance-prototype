@@ -128,6 +128,7 @@ const ClientTasksSection = ({
   const [helpMessage, setHelpMessage] = useState('')
   const menuRef = useRef(null)
   
+  
   // Task modal state
   const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [taskModalMode, setTaskModalMode] = useState('view') // 'view' | 'edit' | 'add'
@@ -181,6 +182,38 @@ const ClientTasksSection = ({
     return title.includes('review') || title.includes('approve')
   }
 
+  // Build review queue from all active review tasks
+  const reviewQueue = React.useMemo(() => {
+    const queue = []
+    project.roadmap.forEach(milestone => {
+      milestone.tasks.forEach(task => {
+        if (isReviewTask(task) && task.status === 'active' && task.assets?.length > 0) {
+          queue.push({ ...task, milestoneId: milestone.id })
+        }
+      })
+    })
+    return queue
+  }, [project])
+  
+  // Pipeline statuses (non-active review tasks)
+  const PIPELINE_STATUSES = ['in_progress_agency', 'approved', 'planned', 'posted']
+  
+  // Build list of all pipeline tasks (tasks that have moved past active review)
+  const pipelineTasks = React.useMemo(() => {
+    const tasks = []
+    project.roadmap.forEach(milestone => {
+      milestone.tasks.forEach(task => {
+        if (isReviewTask(task) && PIPELINE_STATUSES.includes(task.status) && task.assets?.length > 0) {
+          tasks.push({ ...task, milestoneId: milestone.id })
+        }
+      })
+    })
+    return tasks
+  }, [project])
+
+  // Track current index in review queue
+  const [reviewQueueIndex, setReviewQueueIndex] = useState(0)
+
   const handleMarkDone = (task) => {
     if (onTaskToggle) {
       onTaskToggle(task.milestoneId, task.id, 'completed')
@@ -189,13 +222,16 @@ const ClientTasksSection = ({
 
   const handleApprove = (task) => {
     if (onTaskToggle) {
-      onTaskToggle(task.milestoneId, task.id, 'completed')
+      // Mark as approved - client has approved this review task
+      onTaskToggle(task.milestoneId, task.id, 'approved')
     }
   }
 
-  const handleRequestChange = (task) => {
-    if (onRequestChange) {
-      onRequestChange(task.milestoneId, task.id)
+  const handleRequestChange = (task, options = {}) => {
+    if (onTaskToggle) {
+      // Mark as in_progress_agency - sent back to agency for changes
+      // options may contain { autoApprove: true } or { reviewAgain: true }
+      onTaskToggle(task.milestoneId, task.id, 'in_progress_agency', options)
     }
   }
 
@@ -236,6 +272,14 @@ const ClientTasksSection = ({
     })
     setTaskModalMode('view')
     setTaskModalOpen(true)
+    
+    // Set queue index if this is a review task
+    if (isReviewTask(task)) {
+      const queueIdx = reviewQueue.findIndex(t => t.id === task.id)
+      if (queueIdx !== -1) {
+        setReviewQueueIndex(queueIdx)
+      }
+    }
   }
 
   const openAddTaskModal = () => {
@@ -289,7 +333,8 @@ const ClientTasksSection = ({
     active: 'Active Tasks',
     completed: 'Completed',
     backlog: 'Backlog',
-    cancelled: 'Cancelled'
+    cancelled: 'Cancelled',
+    pipeline: 'Pipeline'
   }
 
   // Header component (shared between empty and populated states)
@@ -343,7 +388,22 @@ const ClientTasksSection = ({
 
           {/* Dropdown menu */}
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-md border border-[#E8E8E8] py-1 z-10">
+            <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-md border border-[#E8E8E8] py-1 z-10">
+              {/* Pipeline view */}
+              <button
+                onClick={() => handleStatusViewChange('pipeline')}
+                className={`w-full text-left px-3 py-2 text-13 hover:bg-[#FAFAFA] transition-colors flex items-center justify-between ${
+                  statusView === 'pipeline' ? 'text-[#4D5FFF] font-medium' : 'text-[#3D3D3F]'
+                }`}
+              >
+                <span>Pipeline</span>
+                {pipelineTasks.length > 0 && (
+                  <span className="text-11 text-[#8D8D8D] bg-[#F0F0F0] px-1.5 py-0.5 rounded">{pipelineTasks.length}</span>
+                )}
+              </button>
+              
+              <div className="border-t border-[#E8E8E8] my-1" />
+              
               <button
                 onClick={() => handleStatusViewChange('completed')}
                 className={`w-full text-left px-3 py-2 text-13 hover:bg-[#FAFAFA] transition-colors ${
@@ -810,17 +870,33 @@ const ClientTasksSection = ({
   ) : null
 
   // Review Modal - for review tasks
+  const currentReviewTask = reviewQueue[reviewQueueIndex] || selectedTask
+  
+  const handleReviewNext = () => {
+    if (reviewQueueIndex < reviewQueue.length - 1) {
+      const nextIndex = reviewQueueIndex + 1
+      setReviewQueueIndex(nextIndex)
+      setSelectedTask(reviewQueue[nextIndex])
+    }
+  }
+  
+  const handleReviewPrevious = () => {
+    if (reviewQueueIndex > 0) {
+      const prevIndex = reviewQueueIndex - 1
+      setReviewQueueIndex(prevIndex)
+      setSelectedTask(reviewQueue[prevIndex])
+    }
+  }
+  
   const reviewModal = showReviewModal && selectedTask ? (
     <ReviewModal
-      task={selectedTask}
+      task={currentReviewTask}
       onClose={closeTaskModal}
       onApprove={() => {
-        handleApprove(selectedTask)
-        closeTaskModal()
+        handleApprove(currentReviewTask)
       }}
-      onRequestChanges={() => {
-        handleRequestChange(selectedTask)
-        closeTaskModal()
+      onRequestChanges={(options) => {
+        handleRequestChange(currentReviewTask, options)
       }}
       onAddComment={(comment) => {
         // In a real app, this would persist the comment
@@ -830,8 +906,75 @@ const ClientTasksSection = ({
         // In a real app, this would persist the resolved status
         console.log('Toggle resolved:', commentId)
       }}
+      // Queue props
+      queueIndex={reviewQueueIndex}
+      queueTotal={reviewQueue.length}
+      onNext={handleReviewNext}
+      onPrevious={handleReviewPrevious}
     />
   ) : null
+
+  // Status badge component for pipeline
+  const PipelineStatusBadge = ({ status }) => {
+    const statusConfig = {
+      in_progress_agency: { label: 'In Progress', bg: 'bg-[#EEF0FF]', text: 'text-[#4D5FFF]' },
+      approved: { label: 'Approved', bg: 'bg-[#E9F8E5]', text: 'text-[#22C55E]' },
+      planned: { label: 'Planned', bg: 'bg-[#FEF9E7]', text: 'text-[#D97706]' },
+      posted: { label: 'Posted', bg: 'bg-[#F3E8FF]', text: 'text-[#9333EA]' }
+    }
+    const config = statusConfig[status] || { label: status, bg: 'bg-[#F0F0F0]', text: 'text-[#656565]' }
+    
+    return (
+      <span className={`inline-flex items-center px-2 py-1 rounded text-12 font-medium ${config.bg} ${config.text}`}>
+        {config.label}
+      </span>
+    )
+  }
+  
+  // Get date display for pipeline task
+  const getPipelineDate = (task) => {
+    if (task.status === 'in_progress_agency') {
+      return '—'
+    }
+    if (task.status === 'posted' && task.postedDate) {
+      return task.postedDate
+    }
+    if (task.status === 'planned' && task.scheduledDate) {
+      return task.scheduledDate
+    }
+    if (task.status === 'approved' && task.approvedDate) {
+      return task.approvedDate
+    }
+    // Fallback to due date if available
+    return task.dueDate || '—'
+  }
+
+  // Pipeline row component for inline view
+  const PipelineRow = ({ task, isLast }) => {
+    return (
+      <tr
+        className={`
+          ${!isLast ? 'border-b border-[#F0F0F0]' : ''}
+          hover:bg-[#FAFAFA] transition-colors duration-[120ms]
+        `}
+      >
+        {/* Task Column */}
+        <td className="px-4 py-3">
+          <span className="text-13 text-[#3D3D3F]">{task.title}</span>
+        </td>
+        
+        {/* Date Column */}
+        <td className="px-4 py-3">
+          <span className="text-13 text-[#8D8D8D]">{getPipelineDate(task)}</span>
+        </td>
+        
+        {/* Status Column */}
+        <td className="px-4 py-3">
+          <PipelineStatusBadge status={task.status} />
+        </td>
+      </tr>
+    )
+  }
 
   // Task row component
   const TaskRow = ({ task, isLast }) => {
@@ -855,8 +998,8 @@ const ClientTasksSection = ({
             <span className="text-13 text-[#3D3D3F]">
               {task.title}
             </span>
-            {/* Show Help Requested OR Blocks Milestone, not both */}
-            {task.needsAttention ? (
+            {/* Show Help Requested OR Blocks Milestone, not both - but not for review tasks */}
+            {task.needsAttention && !isReview ? (
               <HelpRequestedBadge />
             ) : task.blocksMilestone ? (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-11 font-medium bg-[#FCF2E7] text-[#42301C] border border-[#F5DCC3]">
@@ -935,6 +1078,52 @@ const ClientTasksSection = ({
           </div>
         </td>
       </tr>
+    )
+  }
+
+  // Pipeline view (separate from regular task views)
+  if (statusView === 'pipeline') {
+    return (
+      <>
+        <div className="bg-white border border-[#E8E8E8] rounded-xl overflow-hidden">
+          <Header />
+          <StatusBanner />
+          
+          {pipelineTasks.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="w-10 h-10 rounded-full bg-[#F0F0F0] flex items-center justify-center mx-auto mb-3">
+                <ClipboardList className="w-5 h-5 text-[#8D8D8D]" />
+              </div>
+              <p className="text-13 text-[#656565]">No items in pipeline</p>
+              <p className="text-12 text-[#8D8D8D] mt-1">Reviewed items will appear here</p>
+            </div>
+          ) : (
+            <div className="overflow-visible">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[#FAFAFA] border-b border-[#E8E8E8]">
+                    <th className="text-left px-4 py-2.5 text-13 font-medium text-[#656565]">Task</th>
+                    <th className="text-left px-4 py-2.5 text-13 font-medium text-[#656565] w-36">Date</th>
+                    <th className="text-left px-4 py-2.5 text-13 font-medium text-[#656565] w-40">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pipelineTasks.map((task, index) => (
+                    <PipelineRow 
+                      key={task.id} 
+                      task={task} 
+                      isLast={index === pipelineTasks.length - 1}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        {helpModal}
+        {taskModal}
+        {reviewModal}
+      </>
     )
   }
 
