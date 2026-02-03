@@ -29,7 +29,47 @@ export const clientProject = {
         { id: 't-6', title: 'Review wireframes and provide feedback', assignee: 'client', assigneeName: 'Sarah Chen', status: 'completed', dueDate: '2026-02-01', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-7', title: 'Design homepage mockup', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'completed', dueDate: '2026-02-03', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-8', title: 'Design inner page templates', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-05', blocksMilestone: false, needsAttention: false, description: '' },
-        { id: 't-9', title: 'Review and approve final designs', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-01-31', blocksMilestone: true, needsAttention: false, description: 'Please review the homepage and inner page designs.\n\n- [ ] Check color consistency\n- [ ] Verify mobile responsiveness\n- [ ] Confirm CTA placements' },
+        { 
+          id: 't-9', 
+          title: 'Review and approve final designs', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-01-31', 
+          blocksMilestone: true, 
+          needsAttention: false, 
+          description: 'Please review the homepage and inner page designs.\n\n- [ ] Check color consistency\n- [ ] Verify mobile responsiveness\n- [ ] Confirm CTA placements',
+          assets: [
+            { id: 'a-1', type: 'image', url: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1200&h=800&fit=crop', name: 'Homepage Design.png' },
+            { id: 'a-2', type: 'image', url: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=1200&h=800&fit=crop', name: 'About Page Design.png' }
+          ],
+          comments: [
+            {
+              id: 'c-1',
+              author: 'Jordan Lee',
+              text: 'Here is the updated homepage design with the new hero section. Let me know your thoughts on the CTA placement.',
+              createdAt: '2026-01-30T14:30:00Z',
+              resolved: false,
+              anchor: { type: 'image', assetId: 'a-1', x: 50, y: 25 }
+            },
+            {
+              id: 'c-2',
+              author: 'Sarah Chen',
+              text: 'Love the overall direction! Can we make the primary button slightly larger?',
+              createdAt: '2026-01-30T15:45:00Z',
+              resolved: true,
+              anchor: { type: 'image', assetId: 'a-1', x: 52, y: 68 }
+            },
+            {
+              id: 'c-3',
+              author: 'Jordan Lee',
+              text: 'Updated the button size as requested. Also refined the spacing around the testimonials.',
+              createdAt: '2026-01-31T09:15:00Z',
+              resolved: false,
+              anchor: { type: 'image', assetId: 'a-1', x: 52, y: 68 }
+            }
+          ]
+        },
         { id: 't-10', title: 'Provide high-res logo and brand assets', assignee: 'client', assigneeName: 'Mike Johnson', status: 'active', dueDate: '2026-02-07', blocksMilestone: true, needsAttention: false, description: 'We need the following assets:\n\n- [ ] Logo in SVG format\n- [ ] Brand color codes\n- [ ] Typography guidelines' },
       ]
     },
@@ -42,7 +82,43 @@ export const clientProject = {
         { id: 't-12', title: 'Build responsive frontend', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-02-20', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-13', title: 'Integrate CMS', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-02-25', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-14', title: 'Provide content for all pages', assignee: 'client', assigneeName: 'Emily Watson', status: 'backlog', dueDate: '2026-02-28', blocksMilestone: true, needsAttention: false, description: 'Content needed for the following pages:\n\n- [ ] Homepage hero text\n- [ ] About Us page\n- [ ] Services descriptions\n- [ ] Contact information' },
-        { id: 't-15', title: 'Review staging site', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-05', blocksMilestone: false, needsAttention: false, description: '' },
+        { 
+          id: 't-15', 
+          title: 'Review staging site', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-03-05', 
+          blocksMilestone: false, 
+          needsAttention: false, 
+          description: 'Please review the staging site walkthrough video and provide feedback.',
+          assets: [
+            { id: 'a-3', type: 'video', url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', name: 'Staging Site Walkthrough.mp4' }
+          ],
+          comments: [
+            {
+              id: 'c-4',
+              author: 'Alex Rivera',
+              text: 'Here is a walkthrough of the staging site. Pay attention to the navigation transitions.',
+              createdAt: '2026-03-01T10:00:00Z',
+              resolved: false,
+              anchor: { type: 'video', assetId: 'a-3', timestamp: 14 }
+            },
+            {
+              id: 'c-5',
+              author: 'Alex Rivera',
+              text: 'The contact form validation is shown here.',
+              createdAt: '2026-03-01T10:05:00Z',
+              resolved: false,
+              anchor: { type: 'video', assetId: 'a-3', timestamp: 45 }
+            }
+          ],
+          reactions: [
+            { id: 'r-1', emoji: 'heart', timestamp: 8, author: 'Sarah Chen', createdAt: '2026-03-02T14:20:00Z' },
+            { id: 'r-2', emoji: 'thumbsUp', timestamp: 22, author: 'Mike Johnson', createdAt: '2026-03-02T15:10:00Z' },
+            { id: 'r-3', emoji: 'fire', timestamp: 38, author: 'Sarah Chen', createdAt: '2026-03-02T14:25:00Z' }
+          ]
+        },
       ]
     },
     {
@@ -51,7 +127,30 @@ export const clientProject = {
       status: 'upcoming',
       tasks: [
         { id: 't-16', title: 'Final QA and bug fixes', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-10', blocksMilestone: false, needsAttention: false, description: '' },
-        { id: 't-17', title: 'Final review and sign-off', assignee: 'client', assigneeName: 'Sarah Chen', status: 'active', dueDate: '2026-03-12', blocksMilestone: true, needsAttention: false, description: '' },
+        { 
+          id: 't-17', 
+          title: 'Final review and sign-off', 
+          assignee: 'client', 
+          assigneeName: 'Sarah Chen', 
+          status: 'active', 
+          dueDate: '2026-03-12', 
+          blocksMilestone: true, 
+          needsAttention: false, 
+          description: 'Please review the final documentation and sign off on the project.',
+          assets: [
+            { id: 'a-4', type: 'pdf', url: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table-word.pdf', name: 'Project Documentation.pdf' }
+          ],
+          comments: [
+            {
+              id: 'c-6',
+              author: 'Jordan Lee',
+              text: 'Here is the final project documentation for your review.',
+              createdAt: '2026-03-10T09:00:00Z',
+              resolved: false,
+              anchor: { type: 'pdf', assetId: 'a-4', page: 1, x: 50, y: 30 }
+            }
+          ]
+        },
         { id: 't-18', title: 'Deploy to production', assignee: 'agency', assigneeName: 'Alex Rivera', status: 'active', dueDate: '2026-03-15', blocksMilestone: false, needsAttention: false, description: '' },
         { id: 't-19', title: 'Handoff documentation and training', assignee: 'agency', assigneeName: 'Jordan Lee', status: 'active', dueDate: '2026-03-18', blocksMilestone: false, needsAttention: false, description: '' },
       ]

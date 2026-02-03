@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { CheckCircle2, ClipboardList, Check, Plus, MoreHorizontal, HelpCircle, ArrowLeft, ThumbsUp, ThumbsDown, X, User, Calendar, Pencil, Target, FileText, ChevronDown } from 'lucide-react'
 import { getTasksForView, isTaskOverdue, formatDueDate, groupTasksByAssignee } from '../data/clientPortalData'
+import ReviewModal from './ReviewModal'
 
 // Searchable Select Component
 const SearchableSelect = ({ value, options, onChange, placeholder = 'Search...', displayValue }) => {
@@ -532,8 +533,9 @@ const ClientTasksSection = ({
   const selectedTaskIsReview = selectedTask ? isReviewTask(selectedTask) : false
 
   // Task Modal - for viewing/editing/adding tasks
-  // Show placeholder modal for review tasks, full modal for regular tasks
-  const taskModal = taskModalOpen ? (
+  // Review tasks in view mode use ReviewModal instead
+  const showReviewModal = taskModalOpen && selectedTaskIsReview && taskModalMode === 'view'
+  const taskModal = taskModalOpen && !showReviewModal ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div 
@@ -561,25 +563,8 @@ const ClientTasksSection = ({
           </button>
         </div>
         
-        {/* Show placeholder for review tasks in view mode */}
-        {selectedTaskIsReview && taskModalMode === 'view' ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#F5F5F5] flex items-center justify-center mb-4">
-              <ThumbsUp className="w-8 h-8 text-[#BFBCBA]" />
-            </div>
-            <h3 className="text-18 font-semibold text-[#18181A] mb-2">{taskForm.title}</h3>
-            <p className="text-14 text-[#736F6D] max-w-xs">
-              Review feedback view coming soon. Use the action buttons in the task list to approve or request changes.
-            </p>
-            <button
-              onClick={closeTaskModal}
-              className="mt-6 px-5 py-2.5 text-13 font-medium text-white bg-[#4D5FFF] rounded-lg
-                hover:bg-[#4555E3] transition-colors"
-            >
-              Got it
-            </button>
-          </div>
-        ) : (
+        {/* For non-review tasks, show normal task details */}
+        {(
         <>
         {/* Body - Scrollable */}
         <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -824,6 +809,30 @@ const ClientTasksSection = ({
     </div>
   ) : null
 
+  // Review Modal - for review tasks
+  const reviewModal = showReviewModal && selectedTask ? (
+    <ReviewModal
+      task={selectedTask}
+      onClose={closeTaskModal}
+      onApprove={() => {
+        handleApprove(selectedTask)
+        closeTaskModal()
+      }}
+      onRequestChanges={() => {
+        handleRequestChange(selectedTask)
+        closeTaskModal()
+      }}
+      onAddComment={(comment) => {
+        // In a real app, this would persist the comment
+        console.log('New comment:', comment)
+      }}
+      onToggleResolved={(commentId) => {
+        // In a real app, this would persist the resolved status
+        console.log('Toggle resolved:', commentId)
+      }}
+    />
+  ) : null
+
   // Task row component
   const TaskRow = ({ task, isLast }) => {
     const overdue = isTaskOverdue(task)
@@ -953,6 +962,7 @@ const ClientTasksSection = ({
         </div>
         {helpModal}
         {taskModal}
+        {reviewModal}
       </>
     )
   }
@@ -1010,6 +1020,7 @@ const ClientTasksSection = ({
         {/* Help Modal */}
         {helpModal}
         {taskModal}
+        {reviewModal}
       </>
     )
   }
@@ -1049,7 +1060,8 @@ const ClientTasksSection = ({
       
       {/* Help Modal */}
       {helpModal}
-        {taskModal}
+      {taskModal}
+      {reviewModal}
     </>
   )
 }
