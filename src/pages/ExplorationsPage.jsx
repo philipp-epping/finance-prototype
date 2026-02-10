@@ -15,6 +15,12 @@ const explorations = [
     description: 'Client and agency portal views.',
     path: '/client-portal',
   },
+  {
+    id: 'sales-rep-training',
+    title: 'Sales Rep Training and Onboarding',
+    description: 'Sales representative training and onboarding workflows.',
+    path: '/sales-rep-training',
+  },
 ]
 
 function ExplorationsPage() {
